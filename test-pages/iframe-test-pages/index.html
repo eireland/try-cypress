@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>main</title>
+    <script src="main.js"></script>
+    <style>
+		iframe {
+			width: 500px;
+			height: 150px;
+			margin: 20px auto;
+			border: 1px solid #000;
+		}
+	</style>
+  </head>
+  <body>
+    <form id="the-form" action="/">
+        <input type="text" id="my-message" value="boo">
+        <input type="submit" value="postMessage">
+    </form>
+    <div>	<iframe id="my-iframe" name="child-page" src="child-page.html" ></iframe>
+    </div>
+    <div>    
+        <p id="return-message"></p>
+    </div>
+  </body>
+</html>
