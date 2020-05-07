@@ -1,47 +1,26 @@
-/*global iframePhone */
-
+// /*global iframePhone */
 var IframePhoneRpcEndpoint = iframePhone.IframePhoneRpcEndpoint;
 
-function initPhone() {
+function displayMessage(msg){
+    var iframeWin = document.getElementById("received-message");
 
-    var delayedCallback;
+    iframeWin.innerHTML=('got message from parent: '+JSON.stringify(msg));
+}
+function initPhone() {
+    console.log('in initPhone')
 
     function handler(message, callback) {
-
-        if (message && message.echo) {
-            callback(message.echo);
-            return;
+        console.log('message to child: '+ JSON.stringify(message));
+        callback({message:"Reply back from child!"});
+        if (!message==''){
+            displayMessage(message)
         }
-
-        switch (message) {
-            case "hello":
-                callback("hello to you from your child!");
-            return;
-            case "pathname":
-                callback(document.location.pathname);
-            return;
-            case "hash":
-                callback(document.location.hash);
-            return;
-            case "respondAfterDelay":
-                delayedCallback = function() {
-                    callback("delayed response");
-                };
-            return;
-            case "respondAfterDelayedResponse":
-                delayedCallback();
-                callback("response after delayed response");
-            return;
-            case "respondBeforeDelayedResponse":
-                callback("response before delayed response");
-                delayedCallback();
-            return;
-            case "neverRespond":
-            return;
-        }
-
-        callback("Error: didn't understand that message.");
     }
 
-    new IframePhoneRpcEndpoint(handler, 'test-namespace', window.parent, location.origin);
+    var childEndpoint = new IframePhoneRpcEndpoint(handler, 'test-namespace', window.parent, location.origin);
+    console.log('window.parent: '+window.parent+' child location.origin'+JSON.stringify(location.origin))
+    childEndpoint.call({message:'hello'},function(reply){
+        console.log('child said hello');
+        console.log('parent replied with: '+JSON.stringify(reply));
+    });
 }

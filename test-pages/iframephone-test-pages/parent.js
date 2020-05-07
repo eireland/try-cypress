@@ -1,17 +1,37 @@
-/*global iframePhone */
-var iframeWin = document.getElementById("my-iframe").contentWindow
-var form = document.getElementById("the-form"),
-	myMessage = document.getElementById("my-message");  
-	myMessage.select();
-
+// /*global iframePhone */
 var IframePhoneRpcEndpoint = iframePhone.IframePhoneRpcEndpoint;
+var count = 1;
 
 window.onload = function() {
-	function handler(message, callback) {
-		if (message === "hello") {
-			callback("hello to you from your parent!");
-		}
+	var form = document.getElementById("the-form");
+	var	myMessage = document.getElementById("my-message");
+	var childMessage = document.getElementById("return-message");
+	var msg = "start"
+
+	function areIframesLoaded() {
+		return frames['child-1'] && frames['child-1'].loaded 
 	}
 
-	new IframePhoneRpcEndpoint(handler, 'test-namespace', frames['child-iframe'], location.origin);
+	function handler(message, callback) {
+			callback({message:"Child said: "+ JSON.stringify(message)+" Reply back to child"});
+	}
+
+	var parentEndpoint = new IframePhoneRpcEndpoint(handler, 'test-namespace', frames['child-page'], location.origin);
+	console.log('parent location.origin: '+ JSON.stringify(location.origin));
+
+	if (areIframesLoaded){
+		frames['child-page'].initPhone();
+	}
+
+	form.onsubmit = function() {
+		var msg = myMessage.value;
+		parentEndpoint.call({message: msg}, function(reply){
+			console.log('parent said: '+msg);
+			console.log('child replied with: '+JSON.stringify(reply));
+			childMessage.innerHTML=('#'+count+': Got child message: '+JSON.stringify(reply));
+			count=count+1;
+		});
+		return false;
+	};
 };
+
